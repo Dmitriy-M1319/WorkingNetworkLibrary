@@ -186,11 +186,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\мои программы\\С#\\VisualStudioCodeProjects\\WorkingNetworkApplication\\WorkingNetworkLib\\WorkingNetworkLib.csproj",
+      "projectUniqueName": "D:\\мои программы\\С#\\VisualStudioCodeProjects\\WorkingNetwork\\WorkingNetworkLib\\WorkingNetworkLib.csproj",
       "projectName": "WorkingNetworkLib",
-      "projectPath": "D:\\мои программы\\С#\\VisualStudioCodeProjects\\WorkingNetworkApplication\\WorkingNetworkLib\\WorkingNetworkLib.csproj",
+      "projectPath": "D:\\мои программы\\С#\\VisualStudioCodeProjects\\WorkingNetwork\\WorkingNetworkLib\\WorkingNetworkLib.csproj",
       "packagesPath": "C:\\Users\\Дмитрий Мамонов\\.nuget\\packages\\",
-      "outputPath": "D:\\мои программы\\С#\\VisualStudioCodeProjects\\WorkingNetworkApplication\\WorkingNetworkLib\\obj\\",
+      "outputPath": "D:\\мои программы\\С#\\VisualStudioCodeProjects\\WorkingNetwork\\WorkingNetworkLib\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "D:\\Microsoft\\Xamarin\\NuGet\\",

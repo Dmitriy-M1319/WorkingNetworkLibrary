@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace WorkingNetworkLib.Models
 {
@@ -6,11 +7,11 @@ namespace WorkingNetworkLib.Models
     {
         
         public abstract string WorkerName { get; set;}
-        public abstract DateTime StartWorking{ get;set; }
-        public abstract DateTime EndWorking{ get; set; }
-        public abstract int AllCountOfHours { get; set; }
-        public abstract double CalcPay(int countOfDays);
+        public abstract List<DateTime> WorkingDates{ get;set; }
+        public abstract DateTime WorkingToday{ get;set;}
+        
+        public abstract double CalcPay();
         public abstract string PrintInfo();
-        public abstract void SetWorkingHours(int hours);
+        public abstract void SetWorkingHours(int hours, string date);
     }
 }
