@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.IO;
 using System.Text;
 
@@ -8,17 +7,8 @@ namespace WorkingNetworkLib.Models
 {
     public class Employee : Worker
     {
-        public override string WorkerName { get; set; }
-        public override List<DateTime> WorkingDates { get;set; }
-        private string employeeTask;
-        private int salary = 120000;
-        private int hours;
-        private List<string> allTasks = new List<string>();
         
-        public List<int> CountOfHours { get; set; }
-        
-        public override DateTime WorkingToday { get; set; }
-
+        private List<string> employees = new List<string>();
         /// <summary>
         /// Конструктор для добавления сотрудника руководителем
         /// </summary>
@@ -26,12 +16,14 @@ namespace WorkingNetworkLib.Models
         public Employee(string name)
         { 
             WorkerName = name ?? throw new ArgumentNullException("Имя сотрудника не может быть пустым");
+            Salary = 120000;
         }
         public Employee(string name, List<int> count, List<DateTime> dateTimes)
         {
             WorkerName = name ?? throw new ArgumentNullException("Имя сотрудника не может быть пустым!");
             CountOfHours = count ?? throw new ArgumentNullException("Пустое количество часов!");
             WorkingDates = dateTimes ?? throw new ArgumentNullException("Должны быть указаны даты работы!");
+            Salary = 120000;
         }
         
         /// <summary>
@@ -74,12 +66,12 @@ namespace WorkingNetworkLib.Models
         {
             if (GetAllHours()<=160)
             {
-                return GetAllHours() / 160 * salary;
+                return GetAllHours() / 160 * Salary;
             }
             else
             {
-                double salaryForOneHour = salary / 160;
-                return salary + (GetAllHours() - 160) * 2 * salaryForOneHour;
+                double salaryForOneHour = Salary / 160;
+                return Salary + (GetAllHours() - 160) * 2 * salaryForOneHour;
             }
         }
 
@@ -99,27 +91,11 @@ namespace WorkingNetworkLib.Models
             builder.Append($"Всего часов: {GetAllHours()}, зарплата за данный период ={CalcPay()}");
             return builder.ToString();
         }
-        private int GetAllHours()
-        {
-            int hours = 0;
-            foreach (int item in CountOfHours)
-            {
-                hours += item;
-            }
-            return hours;
-        }
+        
         public override void SetWorkingHours(int hours, string date)
         {
-            List<string> employees = new List<string>();
-            using (StreamReader sr = new StreamReader("Список отработанных часов сотрудников.txt"))
-            {
-                string line;
-                while ((line = sr.ReadLine())!=null)
-                {
-                    employees.Add(line);
-                }
-                sr.Close();
-            }
+
+            LoadEmployees();
             bool isNewDate = false;
             foreach (string item in employees)
             {
@@ -137,39 +113,34 @@ namespace WorkingNetworkLib.Models
             }
             if (isNewDate)
             {
-                employees.Add($"{date},{this.WorkerName},{hours},{employeeTask}");
+                employees.Add($"{date},{WorkerName},{hours},{WorkerTask}");
             }
-            using (StreamWriter sw = new StreamWriter("Список отработанных часов сотрудников.txt",false))
+            WriteEmployees();
+            
+        }
+        private void LoadEmployees()
+        {
+            using (StreamReader sr = new StreamReader("Список отработанных часов сотрудников.txt"))
+            {
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    employees.Add(line);
+                }
+                sr.Close();
+            }
+        }
+        private void WriteEmployees()
+        {
+            using (StreamWriter sw = new StreamWriter("Список отработанных часов сотрудников.txt", false))
             {
                 foreach (string item in employees)
                 {
                     sw.WriteLine(item);
                 }
             }
-            
         }
-
-        public static void Write(Worker worker, bool append)
-        {
-            if (worker is Employee)
-            {
-                Employee emp = (Employee)worker;
-                using (StreamWriter sw = new StreamWriter("Список отработанных часов сотрудников.txt",append))
-                {
-                    sw.WriteLine($"{emp.WorkingToday},{emp.hours},{emp.employeeTask}");
-                    sw.Close();
-                }
-            }
-        }
-
-        public void SetEmployeeTask(string task)
-        {
-            employeeTask = task;
-        }
-        public async Task WriteAsync(Worker worker, bool append)
-        {
-            await Task.Run(() => Write(worker,append));
-        }
+        
         /// <summary>
         /// Получение списка всех сотрудников
         /// </summary>
