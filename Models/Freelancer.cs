@@ -1,45 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using WorkingNetworkLib.Repository;
 
 namespace WorkingNetworkLib.Models
 {
     public class Freelancer:Worker
     {
-        public Freelancer(string name)
+        public Freelancer(string name):base(name)
         {
-            WorkerName = name ?? throw new ArgumentNullException("Имя руководителя не должно быть пустым");
             Salary = 1000;
-        }
-
-        //TODO:Вынести в часть класса Worker
-        public override string PrintInfo(DateTime startTime, DateTime endTime)
-        {
-            StringBuilder builder = new StringBuilder();
-            foreach (var pair in DatesAndHours)
-            {
-                if (pair.Key >= startTime && pair.Key <= endTime)
-                {
-                    builder.Append($"Дата - {pair.Key}, отработано {pair.Value} часов");
-                }
-            }
-            builder.Append($"Всего часов: {GetAllHours(startTime, endTime)}, зарплата за данный период ={CalcPay(startTime, endTime)}");
-            return builder.ToString();
         }
 
         public override double CalcPay(DateTime startTime, DateTime endTime)
         {
             return GetAllHours(startTime, endTime) * Salary;
         }
+
         public override void SetWorkingHours(int hours, string date)
         {
             if (DateTime.Today.Day - DateTime.Parse(date).Day > 2)
             {
                 throw new Exception("Нельзя прибавлять часы ранее чем за 2 дня!");
             }
-            Load("Список отработанных часов внештатных сотрудников.txt");
+            WorkerRepository<Freelancer>.SetFileName();
+            WorkerRepository<Freelancer>.LoadWorkersToString();
             bool isNewDate = false;
-            foreach (string item in workers)
+            foreach (string item in WorkerRepository<Freelancer>.ListWorkers)
             {
                 string[] freelancerInfo = item.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 if (freelancerInfo[1] == WorkerName && date == freelancerInfo[0])
@@ -55,9 +40,30 @@ namespace WorkingNetworkLib.Models
             }
             if (isNewDate)
             {
-                workers.Add($"{date},{WorkerName},{hours},{WorkerTask}");
+                WorkerRepository<Freelancer>.ListWorkers.Add($"{date},{WorkerName},{hours},{NewTask}");
             }
-            Write("Список отработанных часов внештатных сотрудников.txt");
+            WorkerRepository<Freelancer>.WriteWorkersToString();
+        }
+
+        public static Freelancer GetCurrentFreelancer(string name)
+        {
+            Freelancer freec = new Freelancer(name);
+            freec.Load("Список отработанных часов внештатных сотрудников.txt");
+            foreach (string line in freec.workers)
+            {
+                string[] freecInfo = line.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                if (freecInfo[1] == name)
+                {
+                    freec.DatesAndHours.Add(DateTime.Parse(freecInfo[0]), int.Parse(freecInfo[2]));
+                    freec.allTasks.Add(freecInfo[3]);
+                }
+            }
+            if (freec.DatesAndHours.Count == 0)
+            {
+                throw new Exception("Данного сотрудника нет в списках!");
+            }
+            return freec;
+
         }
 
     }

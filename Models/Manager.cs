@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text;
+using WorkingNetworkLib.Repository;
 
 namespace WorkingNetworkLib.Models
 {
@@ -7,29 +7,12 @@ namespace WorkingNetworkLib.Models
     {
         
         private readonly int prime = 20000;
-        /// <summary>
-        /// Конструктор для создания руководителей
-        /// </summary>
-        /// <param name="name"></param>
-        public Manager(string name)
+        public Manager(string name):base(name)
         {
-            WorkerName = name ?? throw new ArgumentNullException("Имя руководителя не должно быть пустым");
             Salary = 200000;
         }
     
-        public override string PrintInfo(DateTime startTime, DateTime endTime)
-        {
-            StringBuilder builder = new StringBuilder();
-            foreach (var pair in DatesAndHours)
-            {
-                if (pair.Key >= startTime && pair.Key <= endTime)
-                {
-                    builder.Append($"Дата - {pair.Key}, отработано {pair.Value} часов");
-                }
-            }
-            builder.Append($"Всего часов: {GetAllHours(startTime,endTime)}, зарплата за данный период ={CalcPay(startTime,endTime)}");
-            return builder.ToString();
-        }
+        
         public override double CalcPay(DateTime startTime, DateTime endTime)
         {
             if (GetAllHours(startTime, endTime) <= 160)
@@ -44,14 +27,15 @@ namespace WorkingNetworkLib.Models
 
         public void SetWorkingHours(int hours, string date, string name)
         {
-            Load("Список отработанных часов руководителей.txt");
+            WorkerRepository<Manager>.SetFileName();
+            WorkerRepository<Manager>.LoadWorkersToString();
             bool isNewDate = false;
-            foreach (string item in workers)
+            foreach (string item in WorkerRepository<Manager>.ListWorkers)
             {
-                string[] employeeInfo = item.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                if ((employeeInfo[1] == WorkerName || employeeInfo[1] == name) && date == employeeInfo[0])
+                string[] managerInfo = item.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                if ((managerInfo[1] == WorkerName || managerInfo[1] == name) && date == managerInfo[0])
                 {
-                    employeeInfo[2] = (int.Parse(employeeInfo[2]) + hours).ToString();
+                    managerInfo[2] = (int.Parse(managerInfo[2]) + hours).ToString();
                     isNewDate = false;
                     break;
                 }
@@ -62,9 +46,9 @@ namespace WorkingNetworkLib.Models
             }
             if (isNewDate)
             {
-                workers.Add($"{date},{WorkerName},{hours},{WorkerTask}");
+                WorkerRepository<Manager>.ListWorkers.Add($"{date},{WorkerName},{hours},{NewTask}");
             }
-            Write("Список отработанных часов руководителей.txt");
+            WorkerRepository<Manager>.LoadWorkersToString();
         }
 
         public static Manager GetCurrentManager(string name)
