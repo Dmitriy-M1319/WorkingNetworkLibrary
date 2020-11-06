@@ -8,24 +8,16 @@ namespace WorkingNetworkLib.Models
     public class Employee : Worker
     {
         
-        private List<string> employees = new List<string>();
         /// <summary>
         /// Конструктор для добавления сотрудника руководителем
         /// </summary>
         /// <param name="name"></param>
         public Employee(string name)
-        { 
-            WorkerName = name ?? throw new ArgumentNullException("Имя сотрудника не может быть пустым");
-            Salary = 120000;
-        }
-        public Employee(string name, List<int> count, List<DateTime> dateTimes)
         {
-            WorkerName = name ?? throw new ArgumentNullException("Имя сотрудника не может быть пустым!");
-            CountOfHours = count ?? throw new ArgumentNullException("Пустое количество часов!");
-            WorkingDates = dateTimes ?? throw new ArgumentNullException("Должны быть указаны даты работы!");
-            Salary = 120000;
+            WorkerName = name ?? throw new ArgumentNullException("Имя сотрудника не может быть пустым");
+            Salary = 120000; 
         }
-        
+ 
         /// <summary>
         /// Получение экземпляра сотрудника по имени
         /// </summary>
@@ -33,45 +25,38 @@ namespace WorkingNetworkLib.Models
         /// <returns></returns>
         public static Employee GetCurrentEmployee(string name)
         {
-
-            List<int> countHours = new List<int>();
-            List<DateTime> dateTimes = new List<DateTime>();
-            using (StreamReader sr = new StreamReader("Список отработанных часов сотрудников.txt"))
+            Employee employee = new Employee(name);
+            employee.Load("Список отработанных часов сотрудников.txt");
+            foreach (string line in employee.workers)
             {
-                string line;
-                
-                while ((line = sr.ReadLine()) != null)
+                string[] employeeInfo = line.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                if (employeeInfo[1] == name)
                 {
-                    string[] employeeInfo = line.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (employeeInfo[1]==name)
-                    {
-                        countHours.Add(int.Parse(employeeInfo[2]));
-                        dateTimes.Add(DateTime.Parse(employeeInfo[0]));
-                    }
+                    employee.DatesAndHours.Add(DateTime.Parse(employeeInfo[0]), int.Parse(employeeInfo[2]));
+                    employee.allTasks.Add(employeeInfo[3]);
                 }
-                if (countHours.Count==0)
-                {
-                    throw new Exception("Данного сотрудника нет в списках!");
-                }
-                sr.Close();
             }
-            return new Employee(name, countHours, dateTimes);
+            if (employee.DatesAndHours.Count==0)
+            {
+                throw new Exception("Данного сотрудника нет в списках!");
+            }
+            return employee;
         }
         
         /// <summary>
         /// Расчет заработной платы за период
         /// </summary>
         /// <returns></returns>
-        public override double CalcPay()
+        public override double CalcPay(DateTime startTime, DateTime endTime)
         {
-            if (GetAllHours()<=160)
+            if (GetAllHours(startTime,endTime)<=160)
             {
-                return GetAllHours() / 160 * Salary;
+                return GetAllHours(startTime,endTime) / 160 * Salary;
             }
             else
             {
                 double salaryForOneHour = Salary / 160;
-                return Salary + (GetAllHours() - 160) * 2 * salaryForOneHour;
+                return Salary + (GetAllHours(startTime,endTime) - 160) * 2 * salaryForOneHour;
             }
         }
 
@@ -81,26 +66,30 @@ namespace WorkingNetworkLib.Models
         /// Просмотр информации о данном сотруднике
         /// </summary>
         /// <returns></returns>
-        public override string PrintInfo()
+        public override string PrintInfo(DateTime startTime, DateTime endTime)
         {
             StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < WorkingDates.Count; i++)
+            
+            foreach (var pair in DatesAndHours)
             {
-                builder.Append($"Дата: {WorkingDates[i]} - количество отработанных часов: {CountOfHours[i]}\n");
+                if (pair.Key >= startTime && pair.Key <= endTime)
+                {
+                    builder.Append($"Дата - {pair.Key}, отработано {pair.Value} часов");
+                }
             }
-            builder.Append($"Всего часов: {GetAllHours()}, зарплата за данный период ={CalcPay()}");
+            builder.Append($"Всего часов: {GetAllHours(startTime,  endTime)}, зарплата за данный период ={CalcPay(startTime, endTime)}");
             return builder.ToString();
         }
         
         public override void SetWorkingHours(int hours, string date)
         {
 
-            LoadEmployees();
+            Load("Список отработанных часов сотрудников.txt");
             bool isNewDate = false;
-            foreach (string item in employees)
+            foreach (string item in workers)
             {
                 string[] employeeInfo = item.Split(new char[] { ',' },StringSplitOptions.RemoveEmptyEntries);
-                if (employeeInfo[1] == this.WorkerName && date == employeeInfo[0])
+                if (employeeInfo[1] == WorkerName && date == employeeInfo[0])
                 {
                     employeeInfo[2] = (int.Parse(employeeInfo[2]) + hours).ToString();
                     isNewDate = false;
@@ -113,38 +102,13 @@ namespace WorkingNetworkLib.Models
             }
             if (isNewDate)
             {
-                employees.Add($"{date},{WorkerName},{hours},{WorkerTask}");
+                workers.Add($"{date},{WorkerName},{hours},{WorkerTask}");
             }
-            WriteEmployees();
+            Write("Список отработанных часов сотрудников.txt");
             
         }
-        private void LoadEmployees()
-        {
-            using (StreamReader sr = new StreamReader("Список отработанных часов сотрудников.txt"))
-            {
-                string line;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    employees.Add(line);
-                }
-                sr.Close();
-            }
-        }
-        private void WriteEmployees()
-        {
-            using (StreamWriter sw = new StreamWriter("Список отработанных часов сотрудников.txt", false))
-            {
-                foreach (string item in employees)
-                {
-                    sw.WriteLine(item);
-                }
-            }
-        }
         
-        /// <summary>
-        /// Получение списка всех сотрудников
-        /// </summary>
-        /// <returns></returns>
+        
         public static List<Employee> GetAllEmployees()
         {
             List<Employee> allEmployes = new List<Employee>();
@@ -157,8 +121,7 @@ namespace WorkingNetworkLib.Models
                     if (allEmployes.Count == 0)
                     {
                         Employee emp = new Employee(employeeInfo[1]);
-                        emp.CountOfHours.Add(int.Parse(employeeInfo[2]));
-                        emp.WorkingDates.Add(DateTime.Parse(employeeInfo[0]));
+                        emp.DatesAndHours.Add(DateTime.Parse(employeeInfo[0]), int.Parse(employeeInfo[2]));
                         emp.allTasks.Add(employeeInfo[3]);
                         allEmployes.Add(emp);
                     }
@@ -169,8 +132,7 @@ namespace WorkingNetworkLib.Models
                         {
                             if (emp.WorkerName == employeeInfo[1])
                             {
-                                emp.CountOfHours.Add(int.Parse(employeeInfo[2]));
-                                emp.WorkingDates.Add(DateTime.Parse(employeeInfo[0]));
+                                emp.DatesAndHours.Add(DateTime.Parse(employeeInfo[0]), int.Parse(employeeInfo[2]));
                                 emp.allTasks.Add(employeeInfo[3]);
                                 isNewEmployee = false;
                                 break;
@@ -183,8 +145,7 @@ namespace WorkingNetworkLib.Models
                         if (isNewEmployee)
                         {
                             Employee emp = new Employee(employeeInfo[1]);
-                            emp.CountOfHours.Add(int.Parse(employeeInfo[2]));
-                            emp.WorkingDates.Add(DateTime.Parse(employeeInfo[0]));
+                            emp.DatesAndHours.Add(DateTime.Parse(employeeInfo[0]), int.Parse(employeeInfo[2]));
                             emp.allTasks.Add(employeeInfo[3]);
                             allEmployes.Add(emp);
                         }

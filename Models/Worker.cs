@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace WorkingNetworkLib.Models
 {
@@ -9,14 +10,11 @@ namespace WorkingNetworkLib.Models
         /// Имя сотрудника
         /// </summary>
         public  string WorkerName { get; set;}
-        /// <summary>
-        /// Список дат отработанных часов по порядку
-        /// </summary>
-        public  List<DateTime> WorkingDates{ get;set; }
+        public Dictionary<DateTime,int> DatesAndHours { get; set; }
         /// <summary>
         /// Добавленные сегодня часы
         /// </summary>
-        public  DateTime WorkingToday{ get;set;}
+        public DateTime WorkingToday{ get;set;}
         /// <summary>
         /// Добавленное сегодня задание
         /// </summary>
@@ -31,20 +29,15 @@ namespace WorkingNetworkLib.Models
         protected List<string> allTasks = new List<string>();
 
         /// <summary>
-        /// Список всех отработанных часов
-        /// </summary>
-        public List<int> CountOfHours { get; set; }
-
-        /// <summary>
         /// Расчет заработной платы работника
         /// </summary>
         /// <returns></returns>
-        public virtual double CalcPay() => throw new Exception();
+        public virtual double CalcPay(DateTime startTime,DateTime dateTime) => throw new Exception();
         /// <summary>
         /// Вывод информации о работнике
         /// </summary>
         /// <returns></returns>
-        public  virtual string PrintInfo() => throw new Exception();
+        public  virtual string PrintInfo(DateTime startTime, DateTime endTime) => throw new Exception();
         /// <summary>
         /// Добавление отработанных часов
         /// </summary>
@@ -55,16 +48,57 @@ namespace WorkingNetworkLib.Models
         /// Возвращает сумму всех отработанных часов
         /// </summary>
         /// <returns></returns>
-        public int GetAllHours()
+        public int GetAllHours(DateTime startTime, DateTime endTime)
         {
             int hours = 0;
-            foreach (int item in CountOfHours)
+            foreach (var pair in DatesAndHours)
             {
-                hours += item;
+                if (pair.Key >= startTime && pair.Key <= endTime)
+                {
+                    hours += pair.Value;
+                }
             }
             return hours;
         }
-
+        protected List<string> workers = new List<string>();
+        //загружает данные в виде списка строк
+        protected void Load(string filename)
+        {
+            using (StreamReader sr = new StreamReader(filename))
+            {
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    workers.Add(line);
+                }
+                sr.Close();
+            }
+        }
+        //Записывает данные в файл
+        protected void Write(string filename)
+        {
+            using (StreamWriter sw = new StreamWriter(filename, false))
+            {
+                foreach (string item in workers)
+                {
+                    sw.WriteLine(item);
+                }
+            }
+        }
+        
+        protected bool IsNewWorker(string filename, string name)
+        {
+            Load(filename);
+            foreach (string worker in workers)
+            {
+                string[] info = worker.Split(new char[] { ',' });
+                if (info[1]==name)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
         
     }
 }
