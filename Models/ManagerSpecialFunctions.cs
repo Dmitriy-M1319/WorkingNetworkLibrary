@@ -6,7 +6,7 @@ using System.IO;
 
 namespace WorkingNetworkLib.Models
 {
-    public partial class Manager
+    public class ManagerSpecialFunctions
     {
         private readonly List<Manager> managers = WorkerRepository.GetAllManagers();
         private readonly List<Employee> employees = WorkerRepository.GetAllEmployees();

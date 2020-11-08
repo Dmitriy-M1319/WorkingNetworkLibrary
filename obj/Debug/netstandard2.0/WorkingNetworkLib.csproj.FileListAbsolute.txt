@@ -1,0 +1,9 @@
+D:\мои программы\С#\VisualStudioCodeProjects\WorkingNetwork\WorkingNetworkLib\bin\Debug\netstandard2.0\WorkingNetworkLib.deps.json
+D:\мои программы\С#\VisualStudioCodeProjects\WorkingNetwork\WorkingNetworkLib\bin\Debug\netstandard2.0\WorkingNetworkLib.dll
+D:\мои программы\С#\VisualStudioCodeProjects\WorkingNetwork\WorkingNetworkLib\bin\Debug\netstandard2.0\WorkingNetworkLib.pdb
+D:\мои программы\С#\VisualStudioCodeProjects\WorkingNetwork\WorkingNetworkLib\obj\Debug\netstandard2.0\WorkingNetworkLib.csprojAssemblyReference.cache
+D:\мои программы\С#\VisualStudioCodeProjects\WorkingNetwork\WorkingNetworkLib\obj\Debug\netstandard2.0\WorkingNetworkLib.AssemblyInfoInputs.cache
+D:\мои программы\С#\VisualStudioCodeProjects\WorkingNetwork\WorkingNetworkLib\obj\Debug\netstandard2.0\WorkingNetworkLib.AssemblyInfo.cs
+D:\мои программы\С#\VisualStudioCodeProjects\WorkingNetwork\WorkingNetworkLib\obj\Debug\netstandard2.0\WorkingNetworkLib.csproj.CoreCompileInputs.cache
+D:\мои программы\С#\VisualStudioCodeProjects\WorkingNetwork\WorkingNetworkLib\obj\Debug\netstandard2.0\WorkingNetworkLib.dll
+D:\мои программы\С#\VisualStudioCodeProjects\WorkingNetwork\WorkingNetworkLib\obj\Debug\netstandard2.0\WorkingNetworkLib.pdb

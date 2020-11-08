@@ -9,7 +9,7 @@ namespace WorkingNetworkLib.Models
     {
        
         public  string WorkerName { get; set;}
-        public Dictionary<DateTime,int> DatesAndHours { get; set; }
+        public Dictionary<DateTime, int> DatesAndHours { get; set; } = new Dictionary<DateTime, int>();
         public string NewTask { get; set; }
         public int Salary { get; set; }
         protected List<string> allTasks = new List<string>();

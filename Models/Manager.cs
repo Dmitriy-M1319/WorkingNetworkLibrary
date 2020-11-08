@@ -54,7 +54,7 @@ namespace WorkingNetworkLib.Models
         public static Manager GetCurrentManager(string name)
         {
             Manager manager = new Manager(name);
-            manager.Load("Список отработанных часов руководителей");
+            manager.Load("Список отработанных часов руководителей.txt");
             foreach (string line in manager.workers)
             {
                 string[] employeeInfo = line.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
