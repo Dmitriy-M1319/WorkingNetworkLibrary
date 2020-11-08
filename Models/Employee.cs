@@ -10,8 +10,7 @@ namespace WorkingNetworkLib.Models
         {
             Salary = 120000; 
         }
- 
-       
+
         public static Employee GetCurrentEmployee(string name)
         {
             Employee employee = new Employee(name);
@@ -50,10 +49,10 @@ namespace WorkingNetworkLib.Models
 
         public override void SetWorkingHours(int hours, string date)
         {
-            WorkerRepository<Employee>.SetFileName();
-            WorkerRepository<Employee>.LoadWorkersToString();
+            WorkerRepositoryGeneric<Employee>.SetFileName();
+            WorkerRepositoryGeneric<Employee>.LoadWorkersToString();
             bool isNewDate = false;
-            foreach (string item in WorkerRepository<Employee>.ListWorkers)
+            foreach (string item in WorkerRepositoryGeneric<Employee>.ListWorkers)
             {
                 string[] employeeInfo = item.Split(new char[] { ',' },StringSplitOptions.RemoveEmptyEntries);
                 if (employeeInfo[1] == WorkerName && date == employeeInfo[0])
@@ -69,9 +68,9 @@ namespace WorkingNetworkLib.Models
             }
             if (isNewDate)
             {
-                WorkerRepository<Employee>.ListWorkers.Add($"{date},{WorkerName},{hours},{NewTask}");
+                WorkerRepositoryGeneric<Employee>.ListWorkers.Add($"{DateTime.Today},{WorkerName},{hours},{NewTask}");
             }
-            WorkerRepository<Employee>.WriteWorkersToString();
+            WorkerRepositoryGeneric<Employee>.WriteWorkersToString();
         }
         
     }

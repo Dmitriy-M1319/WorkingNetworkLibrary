@@ -10,7 +10,6 @@ namespace WorkingNetworkLib.Models
        
         public  string WorkerName { get; set;}
         public Dictionary<DateTime,int> DatesAndHours { get; set; }
-        public DateTime WorkingToday{ get;set;}
         public string NewTask { get; set; }
         public int Salary { get; set; }
         protected List<string> allTasks = new List<string>();
@@ -49,30 +48,8 @@ namespace WorkingNetworkLib.Models
             }
             sr.Close();
         }
-        //Записывает данные в файл
-        protected void Write(string filename)
-        {
-            using StreamWriter sw = new StreamWriter(filename, false);
-            foreach (string item in workers)
-            {
-                sw.WriteLine(item);
-            }
-        }
-        
-        protected bool IsNewWorker(string filename, string name)
-        {
-            Load(filename);
-            foreach (string worker in workers)
-            {
-                string[] info = worker.Split(new char[] { ',' });
-                if (info[1]==name)
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-        
+       
+      
         public string PrintInfo(DateTime startTime, DateTime endTime)
         {
             StringBuilder builder = new StringBuilder();
@@ -85,6 +62,10 @@ namespace WorkingNetworkLib.Models
             }
             builder.Append($"Всего часов: {GetAllHours(startTime, endTime)}, зарплата за данный период ={CalcPay(startTime, endTime)}");
             return builder.ToString();
+        }
+        public string GetTask(int index)
+        {
+            return allTasks[index];
         }
     }
 }

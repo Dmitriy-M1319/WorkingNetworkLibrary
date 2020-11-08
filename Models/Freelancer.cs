@@ -21,10 +21,10 @@ namespace WorkingNetworkLib.Models
             {
                 throw new Exception("Нельзя прибавлять часы ранее чем за 2 дня!");
             }
-            WorkerRepository<Freelancer>.SetFileName();
-            WorkerRepository<Freelancer>.LoadWorkersToString();
+            WorkerRepositoryGeneric<Freelancer>.SetFileName();
+            WorkerRepositoryGeneric<Freelancer>.LoadWorkersToString();
             bool isNewDate = false;
-            foreach (string item in WorkerRepository<Freelancer>.ListWorkers)
+            foreach (string item in WorkerRepositoryGeneric<Freelancer>.ListWorkers)
             {
                 string[] freelancerInfo = item.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 if (freelancerInfo[1] == WorkerName && date == freelancerInfo[0])
@@ -40,9 +40,9 @@ namespace WorkingNetworkLib.Models
             }
             if (isNewDate)
             {
-                WorkerRepository<Freelancer>.ListWorkers.Add($"{date},{WorkerName},{hours},{NewTask}");
+                WorkerRepositoryGeneric<Freelancer>.ListWorkers.Add($"{DateTime.Today},{WorkerName},{hours},{NewTask}");
             }
-            WorkerRepository<Freelancer>.WriteWorkersToString();
+            WorkerRepositoryGeneric<Freelancer>.WriteWorkersToString();
         }
 
         public static Freelancer GetCurrentFreelancer(string name)

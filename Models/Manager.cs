@@ -27,10 +27,10 @@ namespace WorkingNetworkLib.Models
 
         public void SetWorkingHours(int hours, string date, string name)
         {
-            WorkerRepository<Manager>.SetFileName();
-            WorkerRepository<Manager>.LoadWorkersToString();
+            WorkerRepositoryGeneric<Manager>.SetFileName();
+            WorkerRepositoryGeneric<Manager>.LoadWorkersToString();
             bool isNewDate = false;
-            foreach (string item in WorkerRepository<Manager>.ListWorkers)
+            foreach (string item in WorkerRepositoryGeneric<Manager>.ListWorkers)
             {
                 string[] managerInfo = item.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 if ((managerInfo[1] == WorkerName || managerInfo[1] == name) && date == managerInfo[0])
@@ -46,9 +46,9 @@ namespace WorkingNetworkLib.Models
             }
             if (isNewDate)
             {
-                WorkerRepository<Manager>.ListWorkers.Add($"{date},{WorkerName},{hours},{NewTask}");
+                WorkerRepositoryGeneric<Manager>.ListWorkers.Add($"{DateTime.Today},{WorkerName},{hours},{NewTask}");
             }
-            WorkerRepository<Manager>.LoadWorkersToString();
+            WorkerRepositoryGeneric<Manager>.LoadWorkersToString();
         }
 
         public static Manager GetCurrentManager(string name)
