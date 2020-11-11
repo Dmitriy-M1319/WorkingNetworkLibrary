@@ -4,8 +4,7 @@ using WorkingNetworkLib.Repository;
 namespace WorkingNetworkLib.Models
 {
     public class Employee : Worker
-    {
-        
+    {  
         public Employee(string name):base(name)
         {
             Salary = 120000; 
@@ -37,7 +36,7 @@ namespace WorkingNetworkLib.Models
         {
             if (GetAllHours(startTime,endTime)<=160)
             {
-                return GetAllHours(startTime,endTime) / 160 * Salary;
+                return (double)(GetAllHours(startTime,endTime)) / 160 * Salary;
             }
             else
             {
@@ -49,15 +48,19 @@ namespace WorkingNetworkLib.Models
 
         public override void SetWorkingHours(int hours, string date)
         {
-            WorkerRepositoryGeneric<Employee>.SetFileName();
-            WorkerRepositoryGeneric<Employee>.LoadWorkersToString();
+            WorkerRepository.SetFileName(this);
+            WorkerRepository.LoadWorkersToString();
             bool isNewDate = false;
-            foreach (string item in WorkerRepositoryGeneric<Employee>.ListWorkers)
+            string replaceString = "";
+            int number = 0;
+            for (int i = 0; i < WorkerRepository.ListWorkers.Count; i++)
             {
-                string[] employeeInfo = item.Split(new char[] { ',' },StringSplitOptions.RemoveEmptyEntries);
+                string[] employeeInfo = WorkerRepository.ListWorkers[i].Split(new char[] { ',' });
                 if (employeeInfo[1] == WorkerName && date == employeeInfo[0])
                 {
                     employeeInfo[2] = (int.Parse(employeeInfo[2]) + hours).ToString();
+                    replaceString = ArrayToString(employeeInfo);
+                    number = i;
                     isNewDate = false;
                     break;
                 }
@@ -68,10 +71,28 @@ namespace WorkingNetworkLib.Models
             }
             if (isNewDate)
             {
-                WorkerRepositoryGeneric<Employee>.ListWorkers.Add($"{DateTime.Today},{WorkerName},{hours},{NewTask}");
+                WorkerRepository.ListWorkers.Add($"{DateTime.Today.ToShortDateString()},{WorkerName},{hours},{NewTask ?? " "}");
             }
-            WorkerRepositoryGeneric<Employee>.WriteWorkersToString();
+            else
+            {
+                WorkerRepository.ListWorkers[number] = replaceString;
+            }
+            WorkerRepository.WriteWorkersToString();
         }
-        
+
+        private string ArrayToString(string[] arr)
+        {
+            string result = "";
+            for (int i = 0; i < arr.Length; i++)
+            {
+                result += arr[i];
+                if (i != 3)
+                {
+                    result += ",";
+                }
+            }
+            return result;
+        }
+
     }
 }

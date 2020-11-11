@@ -12,7 +12,7 @@ namespace WorkingNetworkLib.Models
 
         public override double CalcPay(DateTime startTime, DateTime endTime)
         {
-            return GetAllHours(startTime, endTime) * Salary;
+            return (double)(GetAllHours(startTime, endTime)) * Salary;
         }
 
         public override void SetWorkingHours(int hours, string date)
@@ -21,15 +21,19 @@ namespace WorkingNetworkLib.Models
             {
                 throw new Exception("Нельзя прибавлять часы ранее чем за 2 дня!");
             }
-            WorkerRepositoryGeneric<Freelancer>.SetFileName();
-            WorkerRepositoryGeneric<Freelancer>.LoadWorkersToString();
+            WorkerRepository.SetFileName(this);
+            WorkerRepository.LoadWorkersToString();
             bool isNewDate = false;
-            foreach (string item in WorkerRepositoryGeneric<Freelancer>.ListWorkers)
+            string replaceString = "";
+            int number = 0;
+            for (int i = 0; i < WorkerRepository.ListWorkers.Count; i++)
             {
-                string[] freelancerInfo = item.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                if (freelancerInfo[1] == WorkerName && date == freelancerInfo[0])
+                string[] freecInfo = WorkerRepository.ListWorkers[i].Split(new char[] { ',' });
+                if (freecInfo[1] == WorkerName && date == freecInfo[0])
                 {
-                    freelancerInfo[2] = (int.Parse(freelancerInfo[2]) + hours).ToString();
+                    freecInfo[2] = (int.Parse(freecInfo[2]) + hours).ToString();
+                    replaceString = ArrayToString(freecInfo);
+                    number = i;
                     isNewDate = false;
                     break;
                 }
@@ -40,9 +44,27 @@ namespace WorkingNetworkLib.Models
             }
             if (isNewDate)
             {
-                WorkerRepositoryGeneric<Freelancer>.ListWorkers.Add($"{DateTime.Today},{WorkerName},{hours},{NewTask}");
+                WorkerRepository.ListWorkers.Add($"{DateTime.Today.ToShortDateString()},{WorkerName},{hours},{NewTask ?? " "}");
             }
-            WorkerRepositoryGeneric<Freelancer>.WriteWorkersToString();
+            else
+            {
+                WorkerRepository.ListWorkers[number] = replaceString;
+            }
+            WorkerRepository.WriteWorkersToString();
+        }
+
+        private string ArrayToString(string[] arr)
+        {
+            string result = "";
+            for (int i = 0; i < arr.Length; i++)
+            {
+                result += arr[i];
+                if (i != 3)
+                {
+                    result += ",";
+                }
+            }
+            return result;
         }
 
         public static Freelancer GetCurrentFreelancer(string name)

@@ -8,10 +8,10 @@ namespace WorkingNetworkLib.Models
 {
     public class ManagerSpecialFunctions
     {
-        private readonly List<Manager> managers = WorkerRepository.GetAllManagers();
-        private readonly List<Employee> employees = WorkerRepository.GetAllEmployees();
-        private readonly List<Freelancer> freelancers = WorkerRepository.GetAllFreelances();
-        public string GetReportByAllWorkers(DateTime startTime, DateTime endTime)
+        private static readonly List<Manager> managers = WorkerRepository.GetAllManagers();
+        private static readonly List<Employee> employees = WorkerRepository.GetAllEmployees();
+        private static readonly List<Freelancer> freelancers = WorkerRepository.GetAllFreelances();
+        public static  string GetReportByAllWorkers(DateTime startTime, DateTime endTime)
         {
             int allHours = 0;
             double allSum = 0;
@@ -47,10 +47,10 @@ namespace WorkingNetworkLib.Models
             builder.Append($"Всего отработано {allHours} часов; к выплате {allSum} рублей\n");
             return builder.ToString();
         }
-        public string GetReportByOneWorker(string name, DateTime startTime, DateTime endTime, string position)
+        public static string GetReportByOneWorker(string name, DateTime startTime, DateTime endTime, string position)
         {
             StringBuilder builder = new StringBuilder();
-            Worker worker = GetWorker(name, position);
+            Worker worker = GetWorker(position, name);
             if (worker != null)
             {
                 builder.Append($"Отчет по сотруднику {worker.WorkerName}: период с {startTime} по {endTime}\n");
@@ -72,7 +72,7 @@ namespace WorkingNetworkLib.Models
             }
         }
 
-        private Worker GetWorker(string position, string name)
+        private static  Worker GetWorker(string position, string name)
         {
             return position switch
             {
@@ -83,11 +83,11 @@ namespace WorkingNetworkLib.Models
             };
         }
         
-        public void SetNewWorker(string name, string position)
+        public static void SetNewWorker(string name, string position)
         {
-            using StreamWriter sw = new StreamWriter("Список сотрудников.txt",true);
             if (WorkerRepository.IsNewWorker(name))
             {
+                using StreamWriter sw = new StreamWriter("Список сотрудников.txt", true);
                 sw.WriteLine($"{name},{position}");
             }
             else
