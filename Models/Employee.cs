@@ -12,22 +12,26 @@ namespace WorkingNetworkLib.Models
 
         public static Employee GetCurrentEmployee(string name)
         {
-            Employee employee = new Employee(name);
-            employee.Load("Список отработанных часов сотрудников.txt");
-            foreach (string line in employee.workers)
+            if (!WorkerRepository.IsNewWorker(name))
             {
-                string[] employeeInfo = line.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                if (employeeInfo[1] == name)
+                Employee employee = new Employee(name);
+                employee.Load("Список отработанных часов сотрудников.txt");
+                foreach (string line in employee.workers)
                 {
-                    employee.DatesAndHours.Add(DateTime.Parse(employeeInfo[0]), int.Parse(employeeInfo[2]));
-                    employee.allTasks.Add(employeeInfo[3]);
+                    string[] employeeInfo = line.Split(new char[] { ',' });
+                    if (employeeInfo[1] == name)
+                    {
+                        employee.DatesAndHours.Add(DateTime.Parse(employeeInfo[0]), int.Parse(employeeInfo[2]));
+                        employee.allTasks.Add(employeeInfo[3]);
+                    }
                 }
+                return employee;
             }
-            if (employee.DatesAndHours.Count==0)
+            else
             {
                 throw new Exception("Данного сотрудника нет в списках!");
             }
-            return employee;
+            
         }
         
       

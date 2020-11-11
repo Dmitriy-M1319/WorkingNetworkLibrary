@@ -74,22 +74,25 @@ namespace WorkingNetworkLib.Models
 
         public static Manager GetCurrentManager(string name)
         {
-            Manager manager = new Manager(name);
-            manager.Load("Список отработанных часов руководителей.txt");
-            foreach (string line in manager.workers)
+            if (!WorkerRepository.IsNewWorker(name))
             {
-                string[] employeeInfo = line.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                if (employeeInfo[1] == name)
+                Manager manager = new Manager(name);
+                manager.Load("Список отработанных часов руководителей.txt");
+                foreach (string line in manager.workers)
                 {
-                    manager.DatesAndHours.Add(DateTime.Parse(employeeInfo[0]), int.Parse(employeeInfo[2]));
-                    manager.allTasks.Add(employeeInfo[3]);
+                    string[] employeeInfo = line.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (employeeInfo[1] == name)
+                    {
+                        manager.DatesAndHours.Add(DateTime.Parse(employeeInfo[0]), int.Parse(employeeInfo[2]));
+                        manager.allTasks.Add(employeeInfo[3]);
+                    }
                 }
+                return manager;
             }
-            if(manager.DatesAndHours.Count == 0)
+            else
             {
                 throw new Exception("Данного сотрудника нет в списках!");
             }
-            return manager;
         }
 
         

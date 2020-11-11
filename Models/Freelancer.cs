@@ -69,22 +69,26 @@ namespace WorkingNetworkLib.Models
 
         public static Freelancer GetCurrentFreelancer(string name)
         {
-            Freelancer freec = new Freelancer(name);
-            freec.Load("Список отработанных часов внештатных сотрудников.txt");
-            foreach (string line in freec.workers)
+            if (!WorkerRepository.IsNewWorker(name))
             {
-                string[] freecInfo = line.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                if (freecInfo[1] == name)
+                Freelancer freec = new Freelancer(name);
+                freec.Load("Список отработанных часов внештатных сотрудников.txt");
+                foreach (string line in freec.workers)
                 {
-                    freec.DatesAndHours.Add(DateTime.Parse(freecInfo[0]), int.Parse(freecInfo[2]));
-                    freec.allTasks.Add(freecInfo[3]);
+                    string[] freecInfo = line.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (freecInfo[1] == name)
+                    {
+                        freec.DatesAndHours.Add(DateTime.Parse(freecInfo[0]), int.Parse(freecInfo[2]));
+                        freec.allTasks.Add(freecInfo[3]);
+                    }
                 }
+                return freec;
             }
-            if (freec.DatesAndHours.Count == 0)
+            else
             {
                 throw new Exception("Данного сотрудника нет в списках!");
             }
-            return freec;
+            
 
         }
 
