@@ -25,8 +25,9 @@ namespace WorkingNetworkLib.Models
             }
         }
 
-        public void SetWorkingHours(int hours, string date, string name)
+        public override void SetWorkingHours(int hours, string date)
         {
+            
             WorkerRepository.SetFileName(this);
             WorkerRepository.LoadWorkersToString();
             bool isNewDate = false;
@@ -35,7 +36,7 @@ namespace WorkingNetworkLib.Models
             for (int i = 0; i < WorkerRepository.ListWorkers.Count; i++)
             {
                 string[] managerInfo = WorkerRepository.ListWorkers[i].Split(new char[] { ',' });
-                if ((managerInfo[1] == WorkerName || managerInfo[1] == name) && date == managerInfo[0])
+                if ((managerInfo[1] == WorkerName) && date == managerInfo[0])
                 {
                     managerInfo[2] = (int.Parse(managerInfo[2]) + hours).ToString();
                     replaceString = ArrayToString(managerInfo);
@@ -57,6 +58,28 @@ namespace WorkingNetworkLib.Models
                 WorkerRepository.ListWorkers[number] = replaceString;
             }
             WorkerRepository.WriteWorkersToString();
+        }
+        public  void SetWorkingHours(int hours, string date, string name, string task)
+        {
+            string[] info = WorkerRepository.FindWorker(name);
+            switch (info[1])
+            {
+                case "руководитель":
+                    Manager manager = Manager.GetCurrentManager(name);
+                    manager.NewTask = task;
+                    manager.SetWorkingHours(hours, date);
+                    break;
+                case "сотрудник":
+                    Employee employee = Employee.GetCurrentEmployee(name);
+                    employee.NewTask = task;
+                    employee.SetWorkingHours(hours, date);
+                    break;
+                case "фрилансер":
+                    Freelancer freelancer = Freelancer.GetCurrentFreelancer(name);
+                    freelancer.NewTask = task;
+                    freelancer.SetWorkingHours(hours, date);
+                    break;
+            }
         }
         private string ArrayToString(string [] arr)
         {
