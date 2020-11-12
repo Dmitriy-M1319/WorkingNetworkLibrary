@@ -16,13 +16,13 @@ namespace WorkingNetworkLib.Models
             int allHours = 0;
             double allSum = 0;
             StringBuilder builder = new StringBuilder();
-            builder.Append($"Отчет за период от {startTime} до {endTime}\n");
+            builder.Append($"Отчет за период от {startTime.ToShortDateString()} до {endTime.ToShortDateString()}\n");
             builder.Append("\n");
             builder.Append("Руководители:\n");
             foreach (Manager man in managers)
             {
-                builder.Append($"{man.WorkerName} отработал {man.GetAllHours(startTime, endTime)} " +
-                    $"и заработал {man.CalcPay(startTime, endTime)}\n");
+                builder.Append($"{man.WorkerName} отработал {man.GetAllHours(startTime, endTime)} часов " +
+                    $"и заработал {man.CalcPay(startTime, endTime)} рублей\n");
                 allHours += man.GetAllHours(startTime, endTime);
                 allSum += man.CalcPay(startTime, endTime);
             }
@@ -30,8 +30,8 @@ namespace WorkingNetworkLib.Models
             builder.Append("Сотрудники:\n");
             foreach (var emp in employees)
             {
-                builder.Append($"{emp.WorkerName} отработал {emp.GetAllHours(startTime, endTime)} " +
-                    $"и заработал {emp.CalcPay(startTime, endTime)}\n");
+                builder.Append($"{emp.WorkerName} отработал {emp.GetAllHours(startTime, endTime)} часов " +
+                    $"и заработал {emp.CalcPay(startTime, endTime)} рублей\n");
                 allHours += emp.GetAllHours(startTime, endTime);
                 allSum += emp.CalcPay(startTime, endTime);
             }
@@ -39,8 +39,8 @@ namespace WorkingNetworkLib.Models
             builder.Append("Фрилансеры:\n");
             foreach (var freec in freelancers)
             {
-                builder.Append($"{freec.WorkerName} отработал {freec.GetAllHours(startTime, endTime)} " +
-                    $"и заработал {freec.CalcPay(startTime, endTime)}\n");
+                builder.Append($"{freec.WorkerName} отработал {freec.GetAllHours(startTime, endTime)} часов " +
+                    $"и заработал {freec.CalcPay(startTime, endTime)} рублей\n");
                 allHours += freec.GetAllHours(startTime, endTime);
                 allSum += freec.CalcPay(startTime, endTime);
             }
@@ -53,17 +53,17 @@ namespace WorkingNetworkLib.Models
             Worker worker = GetWorker(position, name);
             if (worker != null)
             {
-                builder.Append($"Отчет по сотруднику {worker.WorkerName}: период с {startTime} по {endTime}\n");
+                builder.Append($"Отчет по сотруднику {worker.WorkerName}: период с {startTime.ToShortDateString()} по {endTime.ToShortDateString()}\n");
                 int i = 0;
                 foreach (var pair in worker.DatesAndHours)
                 {
                     if (pair.Key >= startTime && pair.Key <= endTime)
                     {
-                        builder.Append($"{pair.Key}, {pair.Value} часов, {worker.GetTask(i)}");
+                        builder.Append($"{pair.Key.ToShortDateString()}, {pair.Value} часов, {worker.GetTask(i)}\n");
                     }
                     i++;
                 }
-                builder.Append($"Итого {worker.GetAllHours(startTime, endTime)}, к выплате {worker.CalcPay(startTime, endTime)}");
+                builder.Append($"Итого {worker.GetAllHours(startTime, endTime)}, к выплате {worker.CalcPay(startTime, endTime)} рублей");
                 return builder.ToString();
             }
             else

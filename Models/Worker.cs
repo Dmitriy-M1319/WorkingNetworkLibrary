@@ -12,7 +12,6 @@ namespace WorkingNetworkLib.Models
         public Dictionary<DateTime, int> DatesAndHours { get; set; } = new Dictionary<DateTime, int>();
         public string NewTask { get; set; }
         public int Salary { get; set; }
-        public static event Action NewWorker;
         protected List<string> allTasks = new List<string>();
         protected List<string> workers = new List<string>();
         public Worker(string name)
