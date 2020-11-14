@@ -27,7 +27,10 @@ namespace WorkingNetworkLib.Models
 
         public override void SetWorkingHours(int hours, string date)
         {
-            
+            if (DateTime.Parse(date) > DateTime.Today)
+            {
+                throw new ArgumentException("Дата не может быть позже сегодняшнего дня!");
+            }
             WorkerRepository.SetFileName(this);
             WorkerRepository.LoadWorkersToString();
             bool isNewDate = false;
@@ -51,12 +54,13 @@ namespace WorkingNetworkLib.Models
             }
             if (isNewDate)
             {
-                WorkerRepository.ListWorkers.Add($"{DateTime.Today.ToShortDateString()},{WorkerName},{hours},{NewTask ?? " "}");
+                WorkerRepository.ListWorkers.Add($"{date},{WorkerName},{hours},{NewTask ?? " "}");
             }
             else
             {
                 WorkerRepository.ListWorkers[number] = replaceString;
             }
+            WorkerRepository.ListWorkers.Sort();
             WorkerRepository.WriteWorkersToString();
         }
         public  void SetWorkingHours(int hours, string date, string name, string task)
