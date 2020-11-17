@@ -14,7 +14,7 @@ namespace WorkingNetworkLib.Models
         {
             return (double)(GetAllHours(startTime, endTime)) * Salary;
         }
-
+        
         public override void SetWorkingHours(int hours, string date)
         {
             if (DateTime.Today.Day - DateTime.Parse(date).Day > 2)
@@ -27,50 +27,13 @@ namespace WorkingNetworkLib.Models
             }
             WorkerRepository.SetFileName(this);
             WorkerRepository.LoadWorkersToString();
-            bool isNewDate = false;
-            string replaceString = "";
-            int number = 0;
-            for (int i = 0; i < WorkerRepository.ListWorkers.Count; i++)
-            {
-                string[] freecInfo = WorkerRepository.ListWorkers[i].Split(new char[] { ',' });
-                if (freecInfo[1] == WorkerName && date == freecInfo[0])
-                {
-                    freecInfo[2] = (int.Parse(freecInfo[2]) + hours).ToString();
-                    replaceString = ArrayToString(freecInfo);
-                    number = i;
-                    isNewDate = false;
-                    break;
-                }
-                else
-                {
-                    isNewDate = true;
-                }
-            }
-            if (isNewDate)
-            {
-                WorkerRepository.ListWorkers.Add($"{date},{WorkerName},{hours},{NewTask ?? " "}");
-            }
-            else
-            {
-                WorkerRepository.ListWorkers[number] = replaceString;
-            }
+            RefactorStringParameters.Worker = this;
+            var parameters = RefactorStringParameters.FindOrCreateNewNote(date, hours);
+            RefactorStringParameters.RefactorListWorkers(parameters, hours, date);
             WorkerRepository.ListWorkers.Sort();
             WorkerRepository.WriteWorkersToString();
         }
-
-        private string ArrayToString(string[] arr)
-        {
-            string result = "";
-            for (int i = 0; i < arr.Length; i++)
-            {
-                result += arr[i];
-                if (i != 3)
-                {
-                    result += ",";
-                }
-            }
-            return result;
-        }
+       
 
         public static Freelancer GetCurrentFreelancer(string name)
         {

@@ -15,8 +15,9 @@ namespace WorkingNetworkLib.Models
             if (!WorkerRepository.IsNewWorker(name))
             {
                 Employee employee = new Employee(name);
-                employee.Load("Список отработанных часов сотрудников.txt");
-                foreach (string line in employee.workers)
+                WorkerRepository.SetFileName(employee);
+                WorkerRepository.LoadWorkersToString();
+                foreach (string line in WorkerRepository.ListWorkers)
                 {
                     string[] employeeInfo = line.Split(new char[] { ',' });
                     if (employeeInfo[1] == name)
@@ -34,8 +35,6 @@ namespace WorkingNetworkLib.Models
             
         }
         
-      
-
         public override double CalcPay(DateTime startTime, DateTime endTime)
         {
             if (GetAllHours(startTime,endTime)<=160)
@@ -49,7 +48,6 @@ namespace WorkingNetworkLib.Models
             }
         }
 
-
         public override void SetWorkingHours(int hours, string date)
         {
             if (DateTime.Parse(date) > DateTime.Today)
@@ -58,50 +56,11 @@ namespace WorkingNetworkLib.Models
             }
             WorkerRepository.SetFileName(this);
             WorkerRepository.LoadWorkersToString();
-            bool isNewDate = false;
-            string replaceString = "";
-            int number = 0;
-            for (int i = 0; i < WorkerRepository.ListWorkers.Count; i++)
-            {
-                string[] employeeInfo = WorkerRepository.ListWorkers[i].Split(new char[] { ',' });
-                if (employeeInfo[1] == WorkerName && date == employeeInfo[0])
-                {
-                    employeeInfo[2] = (int.Parse(employeeInfo[2]) + hours).ToString();
-                    replaceString = ArrayToString(employeeInfo);
-                    number = i;
-                    isNewDate = false;
-                    break;
-                }
-                else
-                {
-                    isNewDate = true;
-                }
-            }
-            if (isNewDate)
-            {
-                WorkerRepository.ListWorkers.Add($"{date},{WorkerName},{hours},{NewTask ?? " "}");
-            }
-            else
-            {
-                WorkerRepository.ListWorkers[number] = replaceString;
-            }
+            RefactorStringParameters.Worker = this;
+            var parameters = RefactorStringParameters.FindOrCreateNewNote(date, hours);
+            RefactorStringParameters.RefactorListWorkers(parameters, hours, date);
             WorkerRepository.ListWorkers.Sort();
             WorkerRepository.WriteWorkersToString();
         }
-
-        private string ArrayToString(string[] arr)
-        {
-            string result = "";
-            for (int i = 0; i < arr.Length; i++)
-            {
-                result += arr[i];
-                if (i != 3)
-                {
-                    result += ",";
-                }
-            }
-            return result;
-        }
-
     }
 }

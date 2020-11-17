@@ -33,36 +33,13 @@ namespace WorkingNetworkLib.Models
             }
             WorkerRepository.SetFileName(this);
             WorkerRepository.LoadWorkersToString();
-            bool isNewDate = false;
-            string replaceString = "";
-            int number = 0;
-            for (int i = 0; i < WorkerRepository.ListWorkers.Count; i++)
-            {
-                string[] managerInfo = WorkerRepository.ListWorkers[i].Split(new char[] { ',' });
-                if ((managerInfo[1] == WorkerName) && date == managerInfo[0])
-                {
-                    managerInfo[2] = (int.Parse(managerInfo[2]) + hours).ToString();
-                    replaceString = ArrayToString(managerInfo);
-                    number = i;
-                    isNewDate = false;
-                    break;
-                }
-                else
-                {
-                    isNewDate = true;
-                }
-            }
-            if (isNewDate)
-            {
-                WorkerRepository.ListWorkers.Add($"{date},{WorkerName},{hours},{NewTask ?? " "}");
-            }
-            else
-            {
-                WorkerRepository.ListWorkers[number] = replaceString;
-            }
+            RefactorStringParameters.Worker = this;
+            var parameters = RefactorStringParameters.FindOrCreateNewNote(date, hours);
+            RefactorStringParameters.RefactorListWorkers(parameters, hours, date);
             WorkerRepository.ListWorkers.Sort();
             WorkerRepository.WriteWorkersToString();
         }
+
         public  void SetWorkingHours(int hours, string date, string name, string task)
         {
             string[] info = WorkerRepository.FindWorker(name);
@@ -85,20 +62,7 @@ namespace WorkingNetworkLib.Models
                     break;
             }
         }
-        private string ArrayToString(string [] arr)
-        {
-            string result = "";
-            for (int i = 0; i < arr.Length; i++)
-            {
-                result += arr[i];
-                if (i != 3)
-                {
-                    result += ",";
-                }
-            }
-            return result;
-        }
-
+      
         public static Manager GetCurrentManager(string name)
         {
             if (!WorkerRepository.IsNewWorker(name))
